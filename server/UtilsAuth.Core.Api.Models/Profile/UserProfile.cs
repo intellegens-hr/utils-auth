@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Security.Claims;
 
-namespace IdentityUtils.Api.Models.Authentication
+namespace UtilsAuth.Core.Api.Models.Profile
 {
     public class UserProfile : IUserProfile
     {
-        public IEnumerable<Claim> Claims { get; set; }
+        public IEnumerable<AuthUtilsClaim> Claims { get; set; }
     }
 }

@@ -1,11 +1,11 @@
-﻿using IdentityUtils.Api.Models.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using UtilsAuth.Core.Api.Models.Authentication;
+using UtilsAuth.Core.Api.Models.Profile;
 using UtilsAuth.Core.Configuration;
 using UtilsAuth.Core.Models;
 using UtilsAuth.Services;
@@ -55,7 +55,7 @@ namespace UtilsAuth.Core.Api.Controllers
         {
             var profile = new T
             {
-                Claims = User.Claims.Select(x => new Claim(x.Type, x.Value))
+                Claims = User.Claims.Select(x => new AuthUtilsClaim(x.Type, x.Value))
             };
             return IdentityUtilsResult<T>.SuccessResult(profile);
         }

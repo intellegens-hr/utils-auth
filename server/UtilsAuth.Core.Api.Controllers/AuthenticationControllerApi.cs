@@ -1,4 +1,4 @@
-﻿using IdentityUtils.Api.Models.Authentication;
+﻿using UtilsAuth.Core.Api.Models.Profile;
 using UtilsAuth.Core.Configuration;
 using UtilsAuth.Services;
 using UtilsAuth.Services.Authentication;
