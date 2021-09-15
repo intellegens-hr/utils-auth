@@ -1,0 +1,9 @@
+﻿namespace UtilsAuth.Core.Api.Models.Authentication
+{
+    public class TokenResponse
+    {
+        public string AccessToken { get; set; }
+        public int Lifetime { get; set; }
+        public string RefreshToken { get; set; } = "Not implemented";
+    }
+}

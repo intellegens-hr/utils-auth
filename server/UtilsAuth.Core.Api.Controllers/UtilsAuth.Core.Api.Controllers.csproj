@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UtilsAuth.Core.Api.Models\UtilsAuth.Core.Api.Models.csproj" />
+    <ProjectReference Include="..\UtilsAuth.Services\UtilsAuth.Services.csproj" />
+  </ItemGroup>
+
+</Project>
