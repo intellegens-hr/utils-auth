@@ -13,12 +13,12 @@ namespace UtilsAuth.Services.Authentication
     public class JwtTokenService : IJwtTokenService
     {
         private readonly UtilsAuthDbContext dbContext;
-        private readonly ITokenClaimsLoadService profileService;
+        private readonly ITokenClaimsLoadService tokenClaimsLoadService;
 
-        public JwtTokenService(UtilsAuthDbContext dbContext, ITokenClaimsLoadService profileService)
+        public JwtTokenService(UtilsAuthDbContext dbContext, ITokenClaimsLoadService tokenClaimsLoadService)
         {
             this.dbContext = dbContext;
-            this.profileService = profileService;
+            this.tokenClaimsLoadService = tokenClaimsLoadService;
         }
 
         public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, int userId)
@@ -35,7 +35,7 @@ namespace UtilsAuth.Services.Authentication
 
         public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, UserDb user)
         {
-            var claims = await profileService.GetClaims(user);
+            var claims = await tokenClaimsLoadService.GetClaims(user);
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);

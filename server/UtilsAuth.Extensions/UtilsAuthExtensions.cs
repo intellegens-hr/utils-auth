@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using UtilsAuth.Core.Configuration;
@@ -16,14 +15,21 @@ namespace UtilsAuth.Extensions
 {
     public static class UtilsAuthExtensions
     {
-        public static IServiceCollection AddUtilsAuth<TDbContext, TProfileService, TTokenService>(this IServiceCollection services, IUtilsAuthConfiguration configuration) where TDbContext : UtilsAuthDbContext where TProfileService : class, ITokenClaimsLoadService where TTokenService : class, IJwtTokenService
+        public static IServiceCollection AddUtilsAuth<TDbContext, TTokenClaimsLoadService, TTokenService, TUserProfileService>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
+            where TDbContext : UtilsAuthDbContext
+            where TTokenClaimsLoadService : class, ITokenClaimsLoadService
+            where TTokenService : class, IJwtTokenService
+            where TUserProfileService : class, IUserProfileService
         {
             services.AddDbContext<UtilsAuthDbContext, TDbContext>();
             services.AddScoped<IUtilsAuthConfiguration>(c => configuration);
 
+            services.AddMemoryCache();
+
             services.AddScoped<IUserAuthService, UserAuthService>();
-            services.AddScoped<ITokenClaimsLoadService, TProfileService>();
+            services.AddScoped<ITokenClaimsLoadService, TTokenClaimsLoadService>();
             services.AddScoped<IJwtTokenService, TTokenService>();
+            services.AddScoped<IUserProfileService, TUserProfileService>();
 
             services.AddIdentity<UserDb, RoleDb>()
                 .AddEntityFrameworkStores<TDbContext>()
@@ -41,7 +47,11 @@ namespace UtilsAuth.Extensions
                 {
                     OnTokenValidated = async context =>
                     {
-                        context.Principal.Identities.First().AddClaim(new Claim("my-claim", "claim-value"));
+                        if (context.Principal.Identity.IsAuthenticated)
+                        {
+                            var userProfileService = context.HttpContext.RequestServices.GetRequiredService<IUserProfileService>();
+                            await userProfileService.LoadClaimsToIdentity(context.Principal.Identity as ClaimsIdentity);
+                        }
                     }
                 };
 
@@ -73,7 +83,7 @@ namespace UtilsAuth.Extensions
 
         public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration) where TDbContext : UtilsAuthDbContext
         {
-            return AddUtilsAuth<TDbContext, TokenClaimsLoadService, JwtTokenService>(services, configuration);
+            return AddUtilsAuth<TDbContext, TokenClaimsLoadService, JwtTokenService, UserProfileService>(services, configuration);
         }
     }
 }
