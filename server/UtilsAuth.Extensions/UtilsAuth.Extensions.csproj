@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <RepositoryUrl>https://github.com/intellegens-hr/utils-auth</RepositoryUrl>
+    <Authors>Intellegens</Authors>
+    <Product>UtilsAuth</Product>
+    <Version>0.1.0</Version>
+    <PackageIcon>intellegens_logo.png</PackageIcon>
+    <PackageIconUrl />
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +16,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UtilsAuth.Core.Api.Controllers\UtilsAuth.Core.Api.Controllers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\intellegens_logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
