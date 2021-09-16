@@ -5,10 +5,11 @@
     <PackageId>Intellegens.UtilsAuth.Core.Api.Controllers</PackageId>
     <Authors>Intellegens</Authors>
     <Product>UtilsAuth</Product>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/intellegens-hr/utils-auth</RepositoryUrl>
+    <AssemblyName>Intellegens.UtilsAuth.Core.Api.Controllers</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
