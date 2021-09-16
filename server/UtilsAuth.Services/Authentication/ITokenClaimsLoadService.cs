@@ -5,7 +5,7 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public interface IProfileService
+    public interface ITokenClaimsLoadService
     {
         Task<IEnumerable<Claim>> GetClaims(UserDb user);
     }

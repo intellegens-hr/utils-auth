@@ -4,7 +4,7 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services
 {
-    public interface IUsersService
+    public interface IUserAuthService
     {
         Task<IdentityUtilsResult<UserDb>> ValidateLogin(string username, string password);
     }

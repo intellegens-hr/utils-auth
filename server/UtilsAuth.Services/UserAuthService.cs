@@ -5,11 +5,11 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services
 {
-    public class UsersService : IUsersService
+    public class UserAuthService : IUserAuthService
     {
         private readonly UserManager<UserDb> userManager;
 
-        public UsersService(UserManager<UserDb> userManager)
+        public UserAuthService(UserManager<UserDb> userManager)
         {
             this.userManager = userManager;
         }

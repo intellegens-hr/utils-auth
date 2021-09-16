@@ -10,38 +10,37 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public class TokenService : ITokenService
+    public class JwtTokenService : IJwtTokenService
     {
-        public const int EXPIRY_DURATION_MINUTES = 30;
         private readonly UtilsAuthDbContext dbContext;
-        private readonly IProfileService profileService;
+        private readonly ITokenClaimsLoadService profileService;
 
-        public TokenService(UtilsAuthDbContext dbContext, IProfileService profileService)
+        public JwtTokenService(UtilsAuthDbContext dbContext, ITokenClaimsLoadService profileService)
         {
             this.dbContext = dbContext;
             this.profileService = profileService;
         }
 
-        public async Task<string> BuildToken(string key, string issuer, string audience, int userId)
+        public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, int userId)
         {
             var user = await dbContext.Users.FindAsync(userId);
-            return await BuildToken(key, issuer, audience, user);
+            return await BuildToken(key, issuer, audience, expiryMinutes, user);
         }
 
-        public async Task<string> BuildToken(string key, string issuer, string audience, Guid userId)
+        public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, Guid userId)
         {
             var user = await dbContext.Users.Where(user => user.IdGuid == userId).FirstAsync();
-            return await BuildToken(key, issuer, audience, user);
+            return await BuildToken(key, issuer, audience, expiryMinutes, user);
         }
 
-        public async Task<string> BuildToken(string key, string issuer, string audience, UserDb user)
+        public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, UserDb user)
         {
             var claims = await profileService.GetClaims(user);
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new JwtSecurityToken(issuer, audience, claims,
-                expires: DateTime.Now.AddMinutes(EXPIRY_DURATION_MINUTES), signingCredentials: credentials);
+                expires: DateTime.Now.AddMinutes(expiryMinutes), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 
