@@ -1,13 +1,14 @@
 ﻿using UtilsAuth.Core.Api.Models.Profile;
 using UtilsAuth.Core.Configuration;
+using UtilsAuth.DbContext.Models;
 using UtilsAuth.Services;
 using UtilsAuth.Services.Authentication;
 
 namespace UtilsAuth.Core.Api.Controllers
 {
-    public class AuthenticationControllerApi : AuthenticationControllerApiBase<UserProfile>
+    public class AuthenticationControllerApi : AuthenticationControllerApiBase<UserDb, UserProfile>
     {
-        public AuthenticationControllerApi(IJwtTokenService jwtTokenService, IUserAuthService userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration) : base(jwtTokenService, userAuthService, utilsAuthConfiguration)
+        public AuthenticationControllerApi(IJwtTokenService<UserDb> jwtTokenService, IUserAuthService<UserDb> userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration) : base(jwtTokenService, userAuthService, utilsAuthConfiguration)
         {
         }
     }

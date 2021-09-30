@@ -5,16 +5,19 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using UtilsAuth.DbContext;
+using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public class UserProfileService : IUserProfileService
+    public class UserProfileService<TUserDb, TRoleDb> : IUserProfileService
+        where TUserDb : UserDb
+        where TRoleDb : RoleDb
     {
         public static int claimsCacheSeconds = 60;
-        private readonly UtilsAuthDbContext dbContext;
+        private readonly UtilsAuthDbContext<TUserDb, TRoleDb> dbContext;
         private readonly IMemoryCache memoryCache;
 
-        public UserProfileService(IMemoryCache memoryCache, UtilsAuthDbContext dbContext)
+        public UserProfileService(IMemoryCache memoryCache, UtilsAuthDbContext<TUserDb, TRoleDb> dbContext)
         {
             this.memoryCache = memoryCache;
             this.dbContext = dbContext;
@@ -24,7 +27,7 @@ namespace UtilsAuth.Services.Authentication
         {
             var userId = Convert.ToInt32(identity.Claims.First(x => x.Type == ClaimsConstants.ClaimId).Value);
 
-            var cacheKey = $"{nameof(UserProfileService)}_{nameof(LoadClaimsToIdentity)}_{userId}";
+            var cacheKey = $"UserProfileService_{nameof(LoadClaimsToIdentity)}_{userId}";
             var claimsToSet = await memoryCache.GetOrCreateAsync(cacheKey, async (entry) =>
             {
                 entry.SetAbsoluteExpiration(DateTimeOffset.UtcNow.AddSeconds(claimsCacheSeconds));

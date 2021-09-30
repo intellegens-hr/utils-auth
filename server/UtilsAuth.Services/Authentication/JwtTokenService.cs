@@ -10,12 +10,14 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public class JwtTokenService : IJwtTokenService
+    public class JwtTokenService<TUserDb, TRoleDb> : IJwtTokenService<TUserDb>
+        where TUserDb : UserDb
+        where TRoleDb : RoleDb
     {
-        private readonly UtilsAuthDbContext dbContext;
-        private readonly ITokenClaimsLoadService tokenClaimsLoadService;
+        private readonly UtilsAuthDbContext<TUserDb, TRoleDb> dbContext;
+        private readonly ITokenClaimsLoadService<TUserDb> tokenClaimsLoadService;
 
-        public JwtTokenService(UtilsAuthDbContext dbContext, ITokenClaimsLoadService tokenClaimsLoadService)
+        public JwtTokenService(UtilsAuthDbContext<TUserDb, TRoleDb> dbContext, ITokenClaimsLoadService<TUserDb> tokenClaimsLoadService)
         {
             this.dbContext = dbContext;
             this.tokenClaimsLoadService = tokenClaimsLoadService;
@@ -33,7 +35,7 @@ namespace UtilsAuth.Services.Authentication
             return await BuildToken(key, issuer, audience, expiryMinutes, user);
         }
 
-        public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, UserDb user)
+        public async Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user)
         {
             var claims = await tokenClaimsLoadService.GetClaims(user);
 

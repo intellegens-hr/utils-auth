@@ -4,9 +4,10 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public interface IJwtTokenService
+    public interface IJwtTokenService<TUserDb>
+        where TUserDb : UserDb
     {
-        Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, UserDb user);
+        Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user);
 
         Task<string> BuildToken(string key, string issuer, string audience, int expiryMinutes, int userId);
 

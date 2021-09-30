@@ -4,7 +4,9 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.DbContext
 {
-    public class UtilsAuthDbContext : IdentityDbContext<UserDb, RoleDb, int>
+    public class UtilsAuthDbContext<TUserDb, TRoleDb> : IdentityDbContext<TUserDb, TRoleDb, int>
+        where TUserDb : UserDb
+        where TRoleDb : RoleDb
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using UtilsAuth.DbContext;
+using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Demo.Api.DbContext
 {
-    public class AppDbContext : UtilsAuthDbContext
+    public class AppDbContext : UtilsAuthDbContext<UserDb, RoleDb>
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

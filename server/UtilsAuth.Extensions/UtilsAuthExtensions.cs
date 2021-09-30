@@ -1,89 +1,29 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
 using UtilsAuth.Core.Configuration;
 using UtilsAuth.DbContext;
 using UtilsAuth.DbContext.Models;
-using UtilsAuth.Services;
-using UtilsAuth.Services.Authentication;
 
 namespace UtilsAuth.Extensions
 {
     public static class UtilsAuthExtensions
     {
-        public static IServiceCollection AddUtilsAuth<TDbContext, TTokenClaimsLoadService, TTokenService, TUserProfileService>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
-            where TDbContext : UtilsAuthDbContext
-            where TTokenClaimsLoadService : class, ITokenClaimsLoadService
-            where TTokenService : class, IJwtTokenService
-            where TUserProfileService : class, IUserProfileService
+        public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration) 
+            where TDbContext : UtilsAuthDbContext<UserDb, RoleDb>
         {
-            services.AddDbContext<UtilsAuthDbContext, TDbContext>();
-            services.AddScoped<IUtilsAuthConfiguration>(c => configuration);
-
-            services.AddMemoryCache();
-
-            services.AddScoped<IUserAuthService, UserAuthService>();
-            services.AddScoped<ITokenClaimsLoadService, TTokenClaimsLoadService>();
-            services.AddScoped<IJwtTokenService, TTokenService>();
-            services.AddScoped<IUserProfileService, TUserProfileService>();
-
-            services.AddIdentity<UserDb, RoleDb>()
-                .AddEntityFrameworkStores<TDbContext>()
-                .AddDefaultTokenProviders();
-
-            services.AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-            {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = async context =>
-                    {
-                        if (context.Principal.Identity.IsAuthenticated)
-                        {
-                            var userProfileService = context.HttpContext.RequestServices.GetRequiredService<IUserProfileService>();
-                            await userProfileService.LoadClaimsToIdentity(context.Principal.Identity as ClaimsIdentity);
-                        }
-                    }
-                };
-
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration.Issuer,
-                    ValidAudience = configuration.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.JwtKey))
-                };
-            });
-
-            services.AddAuthorization(opt =>
-            {
-                var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-                    JwtBearerDefaults.AuthenticationScheme);
-
-                defaultAuthorizationPolicyBuilder =
-                    defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
-
-                opt.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
-            });
-
+            new UtilsAuthBuilder(services, configuration).AddDefaultConfiguration<TDbContext>();
             return services;
         }
 
-        public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration) where TDbContext : UtilsAuthDbContext
+        public static UtilsAuthBuilder UtilsAuthBuilder(this IServiceCollection services, IUtilsAuthConfiguration configuration)
         {
-            return AddUtilsAuth<TDbContext, TokenClaimsLoadService, JwtTokenService, UserProfileService>(services, configuration);
+            return new UtilsAuthBuilder(services, configuration);
+        }
+
+        public static UtilsAuthBuilder<TUserDb, TRoleDb> UtilsAuthBuilder<TUserDb, TRoleDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
+            where TUserDb : UserDb
+            where TRoleDb : RoleDb
+        {
+            return new UtilsAuthBuilder<TUserDb, TRoleDb>(services, configuration);
         }
     }
 }
