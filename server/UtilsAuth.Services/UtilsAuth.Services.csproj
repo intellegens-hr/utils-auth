@@ -6,10 +6,11 @@
     <Authors>Intellegens</Authors>
     <Company>Intellegens</Company>
     <Product>UtilsAuth</Product>
-    <Version>0.1.1</Version>
+    <Version>0.2.0</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Intellegens.UtilsAuth.Services</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
