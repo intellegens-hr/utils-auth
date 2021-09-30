@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using UtilsAuth.Core.Api.Models.Users;
+using UtilsAuth.DbContext.Models;
 using UtilsAuth.Demo.Api.DbContext;
 using UtilsAuth.Extensions;
 
@@ -48,11 +48,20 @@ namespace UtilsAuth.Demo.Api
             var context = new AppDbContext();
             context.Database.Migrate();
 
+            services.AddAutoMapper(c =>
+            {
+                c.CreateMap<UserDb, UserDto>()
+                .ForMember(x => x.Id, x => x.MapFrom(s => s.Id))
+                .ForMember(x => x.UserName, x => x.MapFrom(s => s.UserName))
+                .ForMember(x => x.Email, x => x.MapFrom(s => s.Email));
+            });
+
             services.AddDbContext<AppDbContext>();
+            services.AddLogging();
             // services.AddControllers();
             services.AddMvcCore().AddUtilsAuthAuthenticationControllerAssemblyPart();
             services.AddUtilsAuth<AppDbContext>(new Configuration());
-            
+
             //services.AddSwaggerGen(c =>
             //{
             //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UtilsAuth.Demo.Api", Version = "v1" });
