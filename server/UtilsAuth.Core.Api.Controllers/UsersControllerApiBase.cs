@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Transactions;
 using UtilsAuth.Core.Api.Models.Users;
@@ -27,9 +29,15 @@ namespace UtilsAuth.Core.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IdentityUtilsResult<TUserDto>> RegisterUser([FromBody] TUserRegistration userRegistrationData)
+        public async virtual Task<IdentityUtilsResult<TUserDto>> RegisterUser([FromBody] TUserRegistration userRegistrationData)
         {
             using var scope = new TransactionScope(asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
+
+            if (userManager.PasswordValidators is IList<IPasswordValidator<TUserDb>> validators)
+            {
+                validators.Clear();
+            }
+            
             var result = await userManager.CreateAsync(new TUserDb
             {
                 Email = userRegistrationData.Email,
