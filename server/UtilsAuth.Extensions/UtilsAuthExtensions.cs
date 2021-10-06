@@ -7,10 +7,19 @@ namespace UtilsAuth.Extensions
 {
     public static class UtilsAuthExtensions
     {
-        public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration) 
+        public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
             where TDbContext : UtilsAuthDbContext<UserDb, RoleDb>
         {
             new UtilsAuthBuilder(services, configuration).AddDefaultConfiguration<TDbContext>();
+            return services;
+        }
+
+        public static IServiceCollection AddUtilsAuth<TDbContext, TUserDb, TRoleDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
+            where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
+            where TUserDb : UserDb
+            where TRoleDb : RoleDb
+        {
+            new UtilsAuthBuilder<TUserDb, TRoleDb>(services, configuration).AddDefaultConfiguration<TDbContext>();
             return services;
         }
 

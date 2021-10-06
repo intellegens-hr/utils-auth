@@ -5,7 +5,7 @@
     <PackageId>Intellegens.UtilsAuth.Core.Api.Controllers</PackageId>
     <Authors>Intellegens</Authors>
     <Product>UtilsAuth</Product>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/intellegens-hr/utils-auth</RepositoryUrl>
