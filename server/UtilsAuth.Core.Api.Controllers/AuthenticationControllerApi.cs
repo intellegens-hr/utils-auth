@@ -8,7 +8,7 @@ namespace UtilsAuth.Core.Api.Controllers
 {
     public class AuthenticationControllerApi : AuthenticationControllerApiBase<UserDb, UserProfile>
     {
-        public AuthenticationControllerApi(IJwtTokenService<UserDb> jwtTokenService, IUserAuthService<UserDb> userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration) : base(jwtTokenService, userAuthService, utilsAuthConfiguration)
+        public AuthenticationControllerApi(IJwtTokenService<UserDb> jwtTokenService, IUserAuthService<UserDb> userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService) : base(jwtTokenService, userAuthService, utilsAuthConfiguration, refreshTokenService)
         {
         }
     }

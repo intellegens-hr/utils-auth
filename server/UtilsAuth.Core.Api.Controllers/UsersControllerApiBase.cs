@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -37,7 +36,7 @@ namespace UtilsAuth.Core.Api.Controllers
             {
                 validators.Clear();
             }
-            
+
             var result = await userManager.CreateAsync(new TUserDb
             {
                 Email = userRegistrationData.Email,
@@ -57,20 +56,18 @@ namespace UtilsAuth.Core.Api.Controllers
 
             var userCreated = await userManager.FindByNameAsync(userRegistrationData.Username);
 
-            foreach (var role in userRegistrationData.Roles)
+            try
             {
-                try
+                result = await userManager.AddToRolesAsync(userCreated, userRegistrationData.Roles);
+                if (!result.Succeeded)
                 {
-                    result = await userManager.AddToRoleAsync(userCreated, role);
-                    if (!result.Succeeded)
-                    {
-                        return result.ToIdentityUtilsResult().ToTypedResult<TUserDto>();
-                    }
+                    return result.ToIdentityUtilsResult().ToTypedResult<TUserDto>();
                 }
-                catch (Exception ex)
-                {
-                    return IdentityUtilsResult<TUserDto>.ErrorResult("Error adding to role");
-                }
+            }
+            catch (Exception ex)
+            {
+                await userManager.DeleteAsync(userCreated);
+                return IdentityUtilsResult<TUserDto>.ErrorResult("Error adding to role");
             }
 
             scope.Complete();

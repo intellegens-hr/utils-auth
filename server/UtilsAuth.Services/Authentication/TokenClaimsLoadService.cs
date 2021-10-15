@@ -27,10 +27,10 @@ namespace UtilsAuth.Services.Authentication
 
             return new[] {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("username", user.UserName),
+                new Claim(ClaimsConstants.ClaimUsername, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("email", user.Email),
-                new Claim("id", user.Id.ToString()),
+                new Claim(ClaimsConstants.ClaimEmail, user.Email),
+                new Claim(ClaimsConstants.ClaimId, user.Id.ToString()),
             }.Concat(rolesClaim);
         }
     }

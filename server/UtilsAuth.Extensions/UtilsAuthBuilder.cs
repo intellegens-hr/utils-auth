@@ -38,6 +38,7 @@ namespace UtilsAuth.Extensions
             where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
         {
             services.AddDbContext<UtilsAuthDbContext<TUserDb, TRoleDb>, TDbContext>();
+            services.AddDbContext<ITokenDbContext, TDbContext>();
             return this;
         }
 
@@ -114,6 +115,7 @@ namespace UtilsAuth.Extensions
             services.AddScoped<ITokenClaimsLoadService<TUserDb>, TTokenClaimsLoadService>();
             services.AddScoped<IJwtTokenService<TUserDb>, TJwtTokenService>();
             services.AddScoped<IUserProfileService, TUserProfileService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             return this;
         }

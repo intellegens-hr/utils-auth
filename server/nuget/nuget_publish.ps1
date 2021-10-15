@@ -7,6 +7,7 @@ dotnet build -c Release
 dotnet pack -c Release
 
 copy .\UtilsAuth.Core\bin\Release\*.nupkg .
+copy .\UtilsAuth.DbContext.Abstractions\bin\Release\*.nupkg .
 copy .\UtilsAuth.DbContext\bin\Release\*.nupkg .
 copy .\UtilsAuth.Services\bin\Release\*.nupkg .
 copy .\UtilsAuth.Core.Api.Models\bin\Release\*.nupkg .
