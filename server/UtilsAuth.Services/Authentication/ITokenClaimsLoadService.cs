@@ -5,8 +5,8 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public interface ITokenClaimsLoadService<TUserDb> where TUserDb : UserDb
+    public interface ITokenClaimsLoadService
     {
-        Task<IEnumerable<Claim>> GetClaims(TUserDb user);
+        Task<IEnumerable<Claim>> GetClaims(int userId);
     }
 }

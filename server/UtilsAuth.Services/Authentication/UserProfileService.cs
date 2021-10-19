@@ -9,15 +9,14 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public class UserProfileService<TUserDb, TRoleDb> : IUserProfileService
+    public class UserProfileService<TUserDb> : IUserProfileService
         where TUserDb : UserDb
-        where TRoleDb : RoleDb
     {
         public static int claimsCacheSeconds = 60;
-        private readonly UtilsAuthDbContext<TUserDb, TRoleDb> dbContext;
+        private readonly UtilsAuthDbContext<TUserDb> dbContext;
         private readonly IMemoryCache memoryCache;
 
-        public UserProfileService(IMemoryCache memoryCache, UtilsAuthDbContext<TUserDb, TRoleDb> dbContext)
+        public UserProfileService(IMemoryCache memoryCache, UtilsAuthDbContext<TUserDb> dbContext)
         {
             this.memoryCache = memoryCache;
             this.dbContext = dbContext;
@@ -32,11 +31,10 @@ namespace UtilsAuth.Services.Authentication
             {
                 entry.SetAbsoluteExpiration(DateTimeOffset.UtcNow.AddSeconds(claimsCacheSeconds));
 
-                var userRolesQuery = dbContext.UserRoles.Where(x => x.UserId == userId).Select(x => x.RoleId);
-                var userRoles = await dbContext.Roles.Where(x => userRolesQuery.Contains(x.Id)).Select(x => x.Name).ToListAsync();
+                var userRoles = await dbContext.UserRoles.Where(x => x.UserId == userId).Select(x => x.Role.Name).ToListAsync();
                 var rolesClaim = userRoles.Select(x => new Claim(ClaimTypes.Role, x));
 
-                var user = await dbContext.Users.FindAsync(userId);
+                var user = await dbContext.Users.Where(x => x.Id == userId).Select(x => new { x.Email }).SingleAsync();
 
                 return new[]
                 {

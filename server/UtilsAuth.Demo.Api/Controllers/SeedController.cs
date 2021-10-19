@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using UtilsAuth.DbContext.Models;
+using UtilsAuth.Demo.Api.DbContext.Models;
 
 namespace UtilsAuth.Demo.Api.Controllers
 {
@@ -10,9 +11,9 @@ namespace UtilsAuth.Demo.Api.Controllers
     public class SeedController : Controller
     {
         private readonly RoleManager<RoleDb> roleManager;
-        private readonly UserManager<UserDb> userManager;
+        private readonly UserManager<UserModel> userManager;
 
-        public SeedController(UserManager<UserDb> userManager, RoleManager<RoleDb> roleManager)
+        public SeedController(UserManager<UserModel> userManager, RoleManager<RoleDb> roleManager)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -41,7 +42,7 @@ namespace UtilsAuth.Demo.Api.Controllers
         [Route("user"), HttpGet]
         public async Task<IActionResult> SeedUsers()
         {
-            await userManager.CreateAsync(new UserDb
+            await userManager.CreateAsync(new UserModel
             {
                 Email = "drazen.mrvos@intellegens.hr",
                 EmailConfirmed = true,

@@ -13,16 +13,15 @@ using UtilsAuth.Services.Authentication;
 
 namespace UtilsAuth.Extensions
 {
-    public class UtilsAuthBuilder : UtilsAuthBuilder<UserDb, RoleDb>
+    public class UtilsAuthBuilder : UtilsAuthBuilder<UserDb>
     {
         public UtilsAuthBuilder(IServiceCollection services, IUtilsAuthConfiguration configuration) : base(services, configuration)
         {
         }
     }
 
-    public class UtilsAuthBuilder<TUserDb, TRoleDb>
+    public class UtilsAuthBuilder<TUserDb>
         where TUserDb : UserDb
-        where TRoleDb : RoleDb
     {
         private readonly IUtilsAuthConfiguration configuration;
         private readonly IServiceCollection services;
@@ -34,28 +33,28 @@ namespace UtilsAuth.Extensions
             AddRequiredServices();
         }
 
-        public UtilsAuthBuilder<TUserDb, TRoleDb> AddDbContext<TDbContext>()
-            where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
+        public UtilsAuthBuilder<TUserDb> AddDbContext<TDbContext>()
+            where TDbContext : UtilsAuthDbContext<TUserDb>
         {
-            services.AddDbContext<UtilsAuthDbContext<TUserDb, TRoleDb>, TDbContext>();
+            services.AddDbContext<UtilsAuthDbContext<TUserDb>, TDbContext>();
             services.AddDbContext<ITokenDbContext, TDbContext>();
             return this;
         }
 
-        public UtilsAuthBuilder<TUserDb, TRoleDb> AddDefaultConfiguration<TDbContext>()
-            where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
+        public UtilsAuthBuilder<TUserDb> AddDefaultConfiguration<TDbContext>()
+            where TDbContext : UtilsAuthDbContext<TUserDb>
         {
             AddDbContext<TDbContext>();
-            AddServices<TokenClaimsLoadService<TUserDb, TRoleDb>, JwtTokenService<TUserDb, TRoleDb>, UserProfileService<TUserDb, TRoleDb>>();
+            AddServices<TokenClaimsLoadService<TUserDb>, JwtTokenService<TUserDb>, UserProfileService<TUserDb>>();
             AddIdentityAndAuthorization<TDbContext>();
 
             return this;
         }
 
-        public UtilsAuthBuilder<TUserDb, TRoleDb> AddIdentityAndAuthorization<TDbContext>()
-            where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
+        public UtilsAuthBuilder<TUserDb> AddIdentityAndAuthorization<TDbContext>()
+            where TDbContext : UtilsAuthDbContext<TUserDb>
         {
-            services.AddIdentity<TUserDb, TRoleDb>()
+            services.AddIdentity<TUserDb, RoleDb>()
                 .AddEntityFrameworkStores<TDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -105,14 +104,14 @@ namespace UtilsAuth.Extensions
             return this;
         }
 
-        public UtilsAuthBuilder<TUserDb, TRoleDb> AddServices<TTokenClaimsLoadService, TJwtTokenService, TUserProfileService>()
-            where TTokenClaimsLoadService : TokenClaimsLoadService<TUserDb, TRoleDb>
-            where TJwtTokenService : JwtTokenService<TUserDb, TRoleDb>
-            where TUserProfileService : UserProfileService<TUserDb, TRoleDb>
+        public UtilsAuthBuilder<TUserDb> AddServices<TTokenClaimsLoadService, TJwtTokenService, TUserProfileService>()
+            where TTokenClaimsLoadService : TokenClaimsLoadService<TUserDb>
+            where TJwtTokenService : JwtTokenService<TUserDb>
+            where TUserProfileService : UserProfileService<TUserDb>
 
         {
             services.AddScoped<IUserAuthService<TUserDb>, UserAuthService<TUserDb>>();
-            services.AddScoped<ITokenClaimsLoadService<TUserDb>, TTokenClaimsLoadService>();
+            services.AddScoped<ITokenClaimsLoadService, TTokenClaimsLoadService>();
             services.AddScoped<IJwtTokenService<TUserDb>, TJwtTokenService>();
             services.AddScoped<IUserProfileService, TUserProfileService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();

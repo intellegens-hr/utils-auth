@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using UtilsAuth.Core.Api.Models.Users;
 using UtilsAuth.DbContext.Models;
 using UtilsAuth.Demo.Api.DbContext;
+using UtilsAuth.Demo.Api.DbContext.Models;
 using UtilsAuth.Extensions;
 
 namespace UtilsAuth.Demo.Api
@@ -50,7 +51,7 @@ namespace UtilsAuth.Demo.Api
 
             services.AddAutoMapper(c =>
             {
-                c.CreateMap<UserDb, UserDto>()
+                c.CreateMap<UserModel, UserDto>()
                 .ForMember(x => x.Id, x => x.MapFrom(s => s.Id))
                 .ForMember(x => x.UserName, x => x.MapFrom(s => s.UserName))
                 .ForMember(x => x.Email, x => x.MapFrom(s => s.Email));
@@ -59,8 +60,8 @@ namespace UtilsAuth.Demo.Api
             services.AddDbContext<AppDbContext>();
             services.AddLogging();
             // services.AddControllers();
-            services.AddMvcCore().AddUtilsAuthAuthenticationControllerAssemblyPart();
-            services.AddUtilsAuth<AppDbContext>(new Configuration());
+            services.AddMvcCore().RemoveUtilsAuthAuthenticationControllerAssemblyPart(); //.AddUtilsAuthAuthenticationControllerAssemblyPart();
+            services.AddUtilsAuth<AppDbContext, UserModel>(new Configuration());
 
             //services.AddSwaggerGen(c =>
             //{

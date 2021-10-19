@@ -10,14 +10,13 @@ using UtilsAuth.DbContext.Models;
 
 namespace UtilsAuth.Services.Authentication
 {
-    public class JwtTokenService<TUserDb, TRoleDb> : IJwtTokenService<TUserDb>
+    public class JwtTokenService<TUserDb> : IJwtTokenService<TUserDb>
         where TUserDb : UserDb
-        where TRoleDb : RoleDb
     {
-        private readonly UtilsAuthDbContext<TUserDb, TRoleDb> dbContext;
-        private readonly ITokenClaimsLoadService<TUserDb> tokenClaimsLoadService;
+        private readonly UtilsAuthDbContext<TUserDb> dbContext;
+        private readonly ITokenClaimsLoadService tokenClaimsLoadService;
 
-        public JwtTokenService(UtilsAuthDbContext<TUserDb, TRoleDb> dbContext, ITokenClaimsLoadService<TUserDb> tokenClaimsLoadService)
+        public JwtTokenService(UtilsAuthDbContext<TUserDb> dbContext, ITokenClaimsLoadService tokenClaimsLoadService)
         {
             this.dbContext = dbContext;
             this.tokenClaimsLoadService = tokenClaimsLoadService;
@@ -25,25 +24,24 @@ namespace UtilsAuth.Services.Authentication
 
         public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, int userId)
         {
-            var user = await dbContext.Users.FindAsync(userId);
-            return await BuildAuthenticationToken(key, issuer, audience, expiryMinutes, user);
-        }
-
-        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, Guid userId)
-        {
-            var user = await dbContext.Users.Where(user => user.IdGuid == userId).FirstAsync();
-            return await BuildAuthenticationToken(key, issuer, audience, expiryMinutes, user);
-        }
-
-        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user)
-        {
-            var claims = await tokenClaimsLoadService.GetClaims(user);
+            var claims = await tokenClaimsLoadService.GetClaims(userId);
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new JwtSecurityToken(issuer, audience, claims,
                 expires: DateTime.Now.AddMinutes(expiryMinutes), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        }
+
+        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, Guid userId)
+        {
+            var id = await dbContext.Users.Where(user => user.IdGuid == userId).Select(x => x.Id).FirstAsync();
+            return await BuildAuthenticationToken(key, issuer, audience, expiryMinutes, id);
+        }
+
+        public Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user)
+        {
+            return BuildAuthenticationToken(key, issuer, audience, expiryMinutes, user.Id);
         }
     }
 }

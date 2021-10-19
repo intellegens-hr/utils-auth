@@ -9,7 +9,7 @@ using UtilsAuth.Demo.Api.DbContext;
 namespace UtilsAuth.Demo.Api.DbContext.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211014144719_Initial")]
+    [Migration("20211019113247_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,10 +30,15 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("RoleDbId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleDbId");
 
                     b.HasIndex("RoleId");
 
@@ -55,9 +60,14 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("UserModelId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserModelId");
 
                     b.ToTable("AspNetUserClaims");
                 });
@@ -81,21 +91,6 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -178,7 +173,32 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("UtilsAuth.DbContext.Models.UserDb", b =>
+            modelBuilder.Entity("UtilsAuth.DbContext.Models.UserRoleDb", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RoleId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UserModelId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("RoleId1");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("UtilsAuth.Demo.Api.DbContext.Models.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -186,6 +206,9 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("AppKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -249,6 +272,10 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("UtilsAuth.DbContext.Models.RoleDb", null)
+                        .WithMany("RoleClaims")
+                        .HasForeignKey("RoleDbId");
+
+                    b.HasOne("UtilsAuth.DbContext.Models.RoleDb", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -257,31 +284,20 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("UtilsAuth.DbContext.Models.UserDb", null)
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
+                        .WithMany("UserClaims")
+                        .HasForeignKey("UserModelId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("UtilsAuth.DbContext.Models.UserDb", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
-                {
-                    b.HasOne("UtilsAuth.DbContext.Models.RoleDb", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UtilsAuth.DbContext.Models.UserDb", null)
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -290,11 +306,48 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("UtilsAuth.DbContext.Models.UserDb", null)
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("UtilsAuth.DbContext.Models.UserRoleDb", b =>
+                {
+                    b.HasOne("UtilsAuth.DbContext.Models.RoleDb", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("UtilsAuth.DbContext.Models.RoleDb", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId1");
+
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("UtilsAuth.Demo.Api.DbContext.Models.UserModel", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserModelId");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("UtilsAuth.DbContext.Models.RoleDb", b =>
+                {
+                    b.Navigation("RoleClaims");
+                });
+
+            modelBuilder.Entity("UtilsAuth.Demo.Api.DbContext.Models.UserModel", b =>
+                {
+                    b.Navigation("UserClaims");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

@@ -29,7 +29,7 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    IdGuid = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AppKey = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -43,7 +43,8 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                     TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false),
+                    IdGuid = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,11 +77,18 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     RoleId = table.Column<int>(type: "INTEGER", nullable: false),
                     ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true),
+                    RoleDbId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleDbId",
+                        column: x => x.RoleDbId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
@@ -97,7 +105,8 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true),
+                    UserModelId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -108,6 +117,12 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,7 +150,9 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<int>(type: "INTEGER", nullable: false)
+                    RoleId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RoleId1 = table.Column<int>(type: "INTEGER", nullable: true),
+                    UserModelId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,11 +164,23 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId1",
+                        column: x => x.RoleId1,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -175,6 +204,11 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleDbId",
+                table: "AspNetRoleClaims",
+                column: "RoleDbId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -191,6 +225,11 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserModelId",
+                table: "AspNetUserClaims",
+                column: "UserModelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
@@ -199,6 +238,16 @@ namespace UtilsAuth.Demo.Api.DbContext.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId1",
+                table: "AspNetUserRoles",
+                column: "RoleId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_UserModelId",
+                table: "AspNetUserRoles",
+                column: "UserModelId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",

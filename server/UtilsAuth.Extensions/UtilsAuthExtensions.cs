@@ -8,18 +8,17 @@ namespace UtilsAuth.Extensions
     public static class UtilsAuthExtensions
     {
         public static IServiceCollection AddUtilsAuth<TDbContext>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
-            where TDbContext : UtilsAuthDbContext<UserDb, RoleDb>
+            where TDbContext : UtilsAuthDbContext<UserDb>
         {
             new UtilsAuthBuilder(services, configuration).AddDefaultConfiguration<TDbContext>();
             return services;
         }
 
-        public static IServiceCollection AddUtilsAuth<TDbContext, TUserDb, TRoleDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
-            where TDbContext : UtilsAuthDbContext<TUserDb, TRoleDb>
+        public static IServiceCollection AddUtilsAuth<TDbContext, TUserDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
+            where TDbContext : UtilsAuthDbContext<TUserDb>
             where TUserDb : UserDb
-            where TRoleDb : RoleDb
         {
-            new UtilsAuthBuilder<TUserDb, TRoleDb>(services, configuration).AddDefaultConfiguration<TDbContext>();
+            new UtilsAuthBuilder<TUserDb>(services, configuration).AddDefaultConfiguration<TDbContext>();
             return services;
         }
 
@@ -28,11 +27,10 @@ namespace UtilsAuth.Extensions
             return new UtilsAuthBuilder(services, configuration);
         }
 
-        public static UtilsAuthBuilder<TUserDb, TRoleDb> UtilsAuthBuilder<TUserDb, TRoleDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
+        public static UtilsAuthBuilder<TUserDb> UtilsAuthBuilder<TUserDb>(this IServiceCollection services, IUtilsAuthConfiguration configuration)
             where TUserDb : UserDb
-            where TRoleDb : RoleDb
         {
-            return new UtilsAuthBuilder<TUserDb, TRoleDb>(services, configuration);
+            return new UtilsAuthBuilder<TUserDb>(services, configuration);
         }
     }
 }
