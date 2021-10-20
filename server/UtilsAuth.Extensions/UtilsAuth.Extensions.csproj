@@ -5,7 +5,7 @@
     <RepositoryUrl>https://github.com/intellegens-hr/utils-auth</RepositoryUrl>
     <Authors>Intellegens</Authors>
     <Product>UtilsAuth</Product>
-    <Version>0.2.5</Version>
+    <Version>0.2.6</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Intellegens.UtilsAuth.Extensions</AssemblyName>

@@ -14,17 +14,15 @@ namespace UtilsAuth.Demo.Api.Controllers
     [Route("/test")]
     public class TestController : Controller
     {
-        private readonly UserManager<UserModel> userManager;
         private readonly UtilsAuthDbContext<UserModel> dbContext;
 
-        public TestController(UserManager<UserModel> userManager, UtilsAuthDbContext<UserModel> dbContext)
+        public TestController(UtilsAuthDbContext<UserModel> dbContext)
         {
-            this.userManager = userManager;
             this.dbContext = dbContext;
         }
 
-        [Route("user-info"), HttpGet]
-        public async Task<IActionResult> UserInfo()
+        [Route("authenticated-user-info"), HttpGet]
+        public IActionResult UserInfo()
         {
             var data = new
             {
@@ -36,8 +34,8 @@ namespace UtilsAuth.Demo.Api.Controllers
             return Json(data);
         }
 
-        [Route("user-info-db/{userId}"), HttpGet]
-        public async Task<IActionResult> UserInfoDb(int userId)
+        [Route("user-info/{userId}"), HttpGet]
+        public async Task<IActionResult> UserInfo(int userId)
         {
             var userData = await dbContext.Users
                 .Where(x => x.Id == userId)
@@ -57,6 +55,30 @@ namespace UtilsAuth.Demo.Api.Controllers
                     }
                 )
                 .FirstOrDefaultAsync();
+
+            return Json(userData);
+        }
+
+        [Route("user-info"), HttpGet]
+        public async Task<IActionResult> UserInfoAll()
+        {
+            var userData = await dbContext.Users
+                .Select(
+                    x => new
+                    {
+                        x.Id,
+                        x.Email,
+                        x.UserName,
+                        Claims = x.UserClaims.Select(c => new { c.ClaimType, c.ClaimValue }),
+                        Roles = x.UserRoles.Select(r => new
+                        {
+                            r.RoleId,
+                            r.Role.Name,
+                            Claims = r.Role.RoleClaims.Select(c => new { c.ClaimType, c.ClaimValue })
+                        })
+                    }
+                )
+                .ToListAsync();
 
             return Json(userData);
         }

@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<RootNamespace>UtilsAuth.DbContext</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Intellegens.UtilsAuth.DbContext.Abstractions</PackageId>
-		<Version>0.2.5</Version>
+		<Version>0.2.6</Version>
 		<Authors>Intellegens</Authors>
 		<Product>UtilsAuth</Product>
 		<PackageIcon>intellegens_logo.png</PackageIcon>
