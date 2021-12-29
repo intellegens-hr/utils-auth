@@ -17,14 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UtilsAuth.Core.Api.Controllers\UtilsAuth.Core.Api.Controllers.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\intellegens_logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UtilsAuth.Core.Api.Controllers\UtilsAuth.Core.Api.Controllers.csproj" />
+    <ProjectReference Include="..\UtilsAuth.Services\UtilsAuth.Services.csproj" />
   </ItemGroup>
 
 </Project>
