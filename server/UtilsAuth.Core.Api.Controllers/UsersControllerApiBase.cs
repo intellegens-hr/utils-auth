@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -46,16 +45,6 @@ namespace UtilsAuth.Core.Api.Controllers
             {
                 validators.Clear();
             }
-            PropertyInfo[] additionalProperties = userRegistrationData.GetType().GetProperties();
-
-            foreach(PropertyInfo additionalProp in additionalProperties)
-            {
-                var name = additionalProp.Name;
-                var val = additionalProp.GetValue(userRegistrationData);
-            }
-
-            //TUserDb userdb = mapper.Map<TUserRegistration>(userRegistrationData);
-     
 
             TUserDb user = new TUserDb
             {
