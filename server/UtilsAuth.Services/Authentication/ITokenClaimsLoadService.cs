@@ -7,6 +7,6 @@ namespace UtilsAuth.Services.Authentication
 {
     public interface ITokenClaimsLoadService
     {
-        Task<IEnumerable<Claim>> GetClaims(int userId);
+        Task<IEnumerable<Claim>> GetClaims(int userId, bool sessionTokens = false, SessionToken? sessionToken = null);
     }
 }

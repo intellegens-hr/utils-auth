@@ -18,7 +18,7 @@ namespace UtilsAuth.Services.Authentication
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Claim>> GetClaims(int userId)
+        public async Task<IEnumerable<Claim>> GetClaims(int userId, bool sessionTokens = false, SessionToken? sessionToken = null)
         {
             var userData = await dbContext.Users
                 .Where(x => x.Id == userId)
@@ -49,7 +49,7 @@ namespace UtilsAuth.Services.Authentication
                 .Select(x => new Claim(x.ClaimType, x.ClaimValue))
                 .Where(x => !userClaims.Select(y => y.Type).Contains(x.Type));
 
-            return new[] {
+            var claims = new[] {
                 new Claim(ClaimTypes.Name, userData.UserName),
                 new Claim(ClaimsConstants.ClaimUsername, userData.UserName),
                 new Claim(ClaimTypes.Email, userData.Email),
@@ -58,6 +58,12 @@ namespace UtilsAuth.Services.Authentication
             }.Concat(userRolesClaim)
             .Concat(userClaims)
             .Concat(roleClaims);
+
+            if (sessionTokens && sessionToken != null) {
+                claims = claims.Concat(new[] { new Claim(ClaimsConstants.ClaimSessionToken, sessionToken.Token) });
+            }
+
+            return claims;
         }
     }
 }
