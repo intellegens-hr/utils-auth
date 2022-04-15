@@ -25,21 +25,24 @@ namespace UtilsAuth.Core.Api.Controllers
         private readonly UserManager<TUserDb> userManager;
         private readonly IJwtTokenService<TUserDb> jwtTokenService;
         private readonly IRefreshTokenService refreshTokenService;
+        private readonly ISessionTokenService sessionTokenService;
         private readonly IUtilsAuthConfiguration utilsAuthConfiguration;
 
-        public UsersControllerApiBase(UserManager<TUserDb> userManager, IMapper mapper, IJwtTokenService<TUserDb> jwtTokenService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService)
+        public UsersControllerApiBase(UserManager<TUserDb> userManager, IMapper mapper, IJwtTokenService<TUserDb> jwtTokenService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService, ISessionTokenService sessionTokenService)
         {
             this.userManager = userManager;
             this.mapper = mapper;
             this.jwtTokenService = jwtTokenService;
             this.utilsAuthConfiguration = utilsAuthConfiguration;
             this.refreshTokenService = refreshTokenService;
+            this.sessionTokenService = sessionTokenService;
         }
 
         [HttpPost("register")]
         public async virtual Task<IdentityUtilsResult<TokenResponse>> RegisterUser([FromBody] TUserRegistration userRegistrationData)
         {
             using var scope = new TransactionScope(asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
+            bool sessionTokens = utilsAuthConfiguration.SessionTokens;
 
             if (userManager.PasswordValidators is IList<IPasswordValidator<TUserDb>> validators)
             {
@@ -81,7 +84,14 @@ namespace UtilsAuth.Core.Api.Controllers
                 return IdentityUtilsResult<TokenResponse>.ErrorResult("Error adding to role");
             }
 
-            var authToken = await jwtTokenService.BuildAuthenticationToken(utilsAuthConfiguration.JwtKey, utilsAuthConfiguration.Issuer, utilsAuthConfiguration.Audience, utilsAuthConfiguration.TokenDurationMinutes, userCreated.Id);
+            SessionToken sessionToken = null;
+
+            if (utilsAuthConfiguration.SessionTokens)
+            {
+                sessionToken = await sessionTokenService.AddNewToken(userCreated.Id);
+            }
+
+            var authToken = await jwtTokenService.BuildAuthenticationToken(utilsAuthConfiguration.JwtKey, utilsAuthConfiguration.Issuer, utilsAuthConfiguration.Audience, utilsAuthConfiguration.TokenDurationMinutes, userCreated.Id, sessionTokens, sessionToken);
             var refreshToken = await refreshTokenService.GenerateRefreshToken(userCreated.Id, utilsAuthConfiguration.RefreshTokenDurationHours);
             var tokenResponse = new TokenResponse
             {

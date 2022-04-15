@@ -138,18 +138,16 @@ namespace UtilsAuth.Extensions
                     defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
 
                 opt.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
-            });
+                opt.AddPolicy(PolicyConstants.OnlyAuthenticated, policy =>
+                   policy.RequireAuthenticatedUser());
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(PolicyConstants.OnlyAuthenticated, policy =>
-                      policy.RequireAuthenticatedUser());
-            });
+                if (configuration.SessionTokens)
+                {
+                    opt.AddPolicy(PolicyConstants.OnlyValidSesssion, policy =>
+                    policy.RequireClaim(ClaimsConstants.ValidSession));
+                }
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(PolicyConstants.OnlyValidSesssion, policy =>
-                      policy.RequireClaim(ClaimsConstants.ValidSession));
+                opt.FallbackPolicy = defaultAuthorizationPolicyBuilder.Build();
             });
 
             return this;

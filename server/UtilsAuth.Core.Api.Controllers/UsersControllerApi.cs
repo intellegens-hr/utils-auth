@@ -12,7 +12,7 @@ namespace UtilsAuth.Core.Api.Controllers
     [Route("/api/v1/users")]
     public class UsersControllerApi : UsersControllerApiBase<UserDb, UserDto, UserRegistrationDto>
     {
-        public UsersControllerApi(UserManager<UserDb> userManager, IMapper mapper, IJwtTokenService<UserDb> jwtTokenService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService) : base(userManager, mapper, jwtTokenService, utilsAuthConfiguration, refreshTokenService)
+        public UsersControllerApi(UserManager<UserDb> userManager, IMapper mapper, IJwtTokenService<UserDb> jwtTokenService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService, ISessionTokenService sessionTokenService) : base(userManager, mapper, jwtTokenService, utilsAuthConfiguration, refreshTokenService, sessionTokenService)
         {
         }
     }
