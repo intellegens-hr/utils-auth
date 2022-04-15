@@ -21,9 +21,9 @@ namespace UtilsAuth.Services.Authentication
         }
 
 
-        public bool CheckTokenValidity(string token)
+        public bool CheckTokenValidity(string token, int userId)
         {
-            SessionToken sessionToken = dbContext.SessionTokens.Where(st => st.Token == token).FirstOrDefault();
+            SessionToken sessionToken = dbContext.SessionTokens.Where(st => st.Token == token && st.UserId == userId).FirstOrDefault();
 
             if(sessionToken != null)
             {
@@ -60,6 +60,21 @@ namespace UtilsAuth.Services.Authentication
             await dbContext.SaveChangesAsync();
 
             return dbContext.SessionTokens.Where(st => st.Token == sessionToken.Token).FirstOrDefault();
+        }
+
+        public async Task<bool> InvalidateToken(string token, int userId)
+        {
+            SessionToken sessionToken = dbContext.SessionTokens.Where(st => st.Token == token && st.UserId == userId).FirstOrDefault();
+
+            if (sessionToken != null)
+            {
+               sessionToken.IsInvalidated = true;
+               await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

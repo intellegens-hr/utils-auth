@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -38,6 +39,7 @@ namespace UtilsAuth.Core.Api.Controllers
             this.sessionTokenService = sessionTokenService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async virtual Task<IdentityUtilsResult<TokenResponse>> RegisterUser([FromBody] TUserRegistration userRegistrationData)
         {

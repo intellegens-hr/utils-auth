@@ -85,11 +85,12 @@ namespace UtilsAuth.Extensions
                             if (configuration.SessionTokens)
                             {
                                 Claim sessionClaim = context.Principal.FindFirst(ClaimsConstants.ClaimSessionToken);
+                                Claim userClaim = context.Principal.FindFirst(ClaimsConstants.ClaimId);
 
-                                if (sessionClaim != null)
+                                if (sessionClaim != null && userClaim != null)
                                 {
                                     ISessionTokenService sessionTokenService = context.HttpContext.RequestServices.GetRequiredService<ISessionTokenService>();
-                                    sessionValid = sessionTokenService.CheckTokenValidity(sessionClaim.Value);
+                                    sessionValid = sessionTokenService.CheckTokenValidity(sessionClaim.Value, Convert.ToInt32(userClaim.Value));
 
                                     if (sessionValid)
                                     {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using UtilsAuth.Core.Api.Models.Authentication;
 using UtilsAuth.Core.Api.Models.Profile;
@@ -33,7 +35,7 @@ namespace UtilsAuth.Core.Api.Controllers
             this.refreshTokenService = refreshTokenService;
             this.sessionTokenService = sessionTokenService;
         }
-
+        [AllowAnonymous]
         [HttpPost("token")]
         public virtual async Task<IdentityUtilsResult<TokenResponse>> GetToken(TokenRequest request)
         {
@@ -97,6 +99,26 @@ namespace UtilsAuth.Core.Api.Controllers
                 Claims = User.Claims.Select(x => new AuthUtilsClaim(x.Type, x.Value)),
             };
             return IdentityUtilsResult<TUserProfile>.SuccessResult(profile);
+        }
+
+        [Authorize]
+        [HttpPut("logout")]
+        public virtual async Task<IdentityUtilsResult<bool>> Logout()
+        {
+            bool success = true;
+            if (utilsAuthConfiguration.SessionTokens)
+            {
+
+                Claim sessionClaim = User.Claims.Where(c => c.Type == ClaimsConstants.ClaimSessionToken).FirstOrDefault();
+                Claim userClaim = User.Claims.Where(c => c.Type == ClaimsConstants.ClaimId).FirstOrDefault();
+
+                if (sessionClaim != null && userClaim != null)
+                {
+                    success = await sessionTokenService.InvalidateToken(sessionClaim.Value, Convert.ToInt32(userClaim.Value));
+                }
+            }
+
+            return IdentityUtilsResult<bool>.SuccessResult(success);
         }
     }
 }

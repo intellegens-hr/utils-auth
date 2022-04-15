@@ -10,8 +10,10 @@ namespace UtilsAuth.Services.Authentication
     public interface ISessionTokenService
     {
 
-        public bool CheckTokenValidity(string sessionToken);
+        public bool CheckTokenValidity(string sessionToken, int userId);
 
         Task<SessionToken> AddNewToken(int userId);
+
+        Task<bool> InvalidateToken(string token, int userId);
     }
 }
