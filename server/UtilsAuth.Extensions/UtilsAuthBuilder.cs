@@ -107,6 +107,11 @@ namespace UtilsAuth.Extensions
                                         context.Response.StatusCode = (int)StatusCodes.Status401Unauthorized;
                                     }
                                 }
+                                else
+                                {
+                                    context.Response.StatusCode = (int)StatusCodes.Status401Unauthorized;
+                                    sessionValid = false;
+                                }
                             }
 
                             if (sessionValid)
