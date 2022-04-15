@@ -13,6 +13,5 @@
     {
         public const string OnlyValidSesssion = "onlysessionvalid";
         public const string OnlyAuthenticated = "onlyauthenticated";
-        public const string OnlyAdmin = "onlyadmin";
     }
 }

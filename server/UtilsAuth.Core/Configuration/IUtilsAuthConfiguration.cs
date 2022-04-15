@@ -9,6 +9,6 @@
         public int RefreshTokenDurationHours { get; }
         public bool SessionTokens { get; }
 
-        public int SessionTokensLimit { get; }
+        public int? SessionTokensLimit { get; }
     }
 }
