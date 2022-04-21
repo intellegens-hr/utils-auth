@@ -102,7 +102,7 @@ namespace UtilsAuth.Core.Api.Controllers
         }
 
         [Authorize]
-        [HttpPut("logout")]
+        [HttpPost("logout")]
         public virtual async Task<IdentityUtilsResult<bool>> Logout()
         {
             bool success = true;
