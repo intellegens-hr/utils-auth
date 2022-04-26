@@ -6,7 +6,7 @@
     <Authors>Intellegens</Authors>
     <Company>Intellegens</Company>
     <Product>UtilsAuth</Product>
-    <Version>0.2.7</Version>
+    <Version>0.2.8</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Intellegens.UtilsAuth.Core.Api.Models</AssemblyName>
