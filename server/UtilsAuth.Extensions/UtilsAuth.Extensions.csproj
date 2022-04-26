@@ -5,7 +5,7 @@
     <RepositoryUrl>https://github.com/intellegens-hr/utils-auth</RepositoryUrl>
     <Authors>Intellegens</Authors>
     <Product>UtilsAuth</Product>
-    <Version>0.2.6</Version>
+    <Version>0.2.7</Version>
     <PackageIcon>intellegens_logo.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Intellegens.UtilsAuth.Extensions</AssemblyName>
@@ -17,14 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UtilsAuth.Core.Api.Controllers\UtilsAuth.Core.Api.Controllers.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\intellegens_logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UtilsAuth.Core.Api.Controllers\UtilsAuth.Core.Api.Controllers.csproj" />
+    <ProjectReference Include="..\UtilsAuth.Services\UtilsAuth.Services.csproj" />
   </ItemGroup>
 
 </Project>
