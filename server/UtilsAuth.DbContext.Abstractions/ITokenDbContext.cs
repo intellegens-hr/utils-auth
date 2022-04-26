@@ -6,5 +6,6 @@ namespace UtilsAuth.DbContext
     public interface ITokenDbContext : IBaseDbContext
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<SessionToken> SessionTokens { get; set; }
     }
 }

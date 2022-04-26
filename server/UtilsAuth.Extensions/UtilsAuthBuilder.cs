@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UtilsAuth.Core.Configuration;
@@ -10,6 +13,9 @@ using UtilsAuth.DbContext;
 using UtilsAuth.DbContext.Models;
 using UtilsAuth.Services;
 using UtilsAuth.Services.Authentication;
+using System.Net;
+using System;
+using System.Collections.Generic;
 
 namespace UtilsAuth.Extensions
 {
@@ -61,6 +67,8 @@ namespace UtilsAuth.Extensions
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.SaveToken = true;
@@ -70,10 +78,47 @@ namespace UtilsAuth.Extensions
                 {
                     OnTokenValidated = async context =>
                     {
+                        
                         if (context.Principal.Identity.IsAuthenticated)
                         {
-                            var userProfileService = context.HttpContext.RequestServices.GetRequiredService<IUserProfileService>();
-                            await userProfileService.LoadClaimsToIdentity(context.Principal.Identity as ClaimsIdentity);
+                            bool sessionValid = true;
+                            if (configuration.SessionTokens)
+                            {
+                                Claim sessionClaim = context.Principal.FindFirst(ClaimsConstants.ClaimSessionToken);
+                                Claim userClaim = context.Principal.FindFirst(ClaimsConstants.ClaimId);
+
+                                if (sessionClaim != null && userClaim != null)
+                                {
+                                    ISessionTokenService sessionTokenService = context.HttpContext.RequestServices.GetRequiredService<ISessionTokenService>();
+                                    sessionValid = sessionTokenService.CheckTokenValidity(sessionClaim.Value, Convert.ToInt32(userClaim.Value));
+
+                                    if (sessionValid)
+                                    {
+                                        List<Claim> claims = new List<Claim>
+                                       {
+                                           new Claim(ClaimsConstants.ValidSession, "true")
+                                       };
+
+                                        ClaimsIdentity sessionIdentity = new ClaimsIdentity(claims);
+                                        context.Principal.AddIdentity(sessionIdentity);
+                                    }
+                                    else
+                                    {
+                                        context.Response.StatusCode = (int)StatusCodes.Status401Unauthorized;
+                                    }
+                                }
+                                else
+                                {
+                                    context.Response.StatusCode = (int)StatusCodes.Status401Unauthorized;
+                                    sessionValid = false;
+                                }
+                            }
+
+                            if (sessionValid)
+                            {
+                                IUserProfileService userProfileService = context.HttpContext.RequestServices.GetRequiredService<IUserProfileService>();
+                                await userProfileService.LoadClaimsToIdentity(context.Principal.Identity as ClaimsIdentity);     
+                            }
                         }
                     }
                 };
@@ -99,6 +144,16 @@ namespace UtilsAuth.Extensions
                     defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
 
                 opt.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+                opt.AddPolicy(PolicyConstants.OnlyAuthenticated, policy =>
+                   policy.RequireAuthenticatedUser());
+
+                if (configuration.SessionTokens)
+                {
+                    opt.AddPolicy(PolicyConstants.OnlyValidSesssion, policy =>
+                    policy.RequireClaim(ClaimsConstants.ValidSession));
+                }
+
+                opt.FallbackPolicy = defaultAuthorizationPolicyBuilder.Build();
             });
 
             return this;
@@ -115,6 +170,7 @@ namespace UtilsAuth.Extensions
             services.AddScoped<IJwtTokenService<TUserDb>, TJwtTokenService>();
             services.AddScoped<IUserProfileService, TUserProfileService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<ISessionTokenService, SessionTokenService>();
 
             return this;
         }

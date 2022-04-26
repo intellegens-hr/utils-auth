@@ -22,26 +22,27 @@ namespace UtilsAuth.Services.Authentication
             this.tokenClaimsLoadService = tokenClaimsLoadService;
         }
 
-        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, int userId)
+        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, int userId, bool sessionTokens, SessionToken? sessionToken = null)
         {
-            var claims = await tokenClaimsLoadService.GetClaims(userId);
+            var claims = await tokenClaimsLoadService.GetClaims(userId, sessionTokens, sessionToken);
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new JwtSecurityToken(issuer, audience, claims,
                 expires: DateTime.Now.AddMinutes(expiryMinutes), signingCredentials: credentials);
+
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 
-        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, Guid userId)
+        public async Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, Guid userId, bool sessionTokens, SessionToken? sessionToken = null)
         {
             var id = await dbContext.Users.Where(user => user.IdGuid == userId).Select(x => x.Id).FirstAsync();
-            return await BuildAuthenticationToken(key, issuer, audience, expiryMinutes, id);
+            return await BuildAuthenticationToken(key, issuer, audience, expiryMinutes, id, sessionTokens, sessionToken);
         }
 
-        public Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user)
+        public Task<string> BuildAuthenticationToken(string key, string issuer, string audience, int expiryMinutes, TUserDb user, bool sessionTokens, SessionToken? sessionToken = null)
         {
-            return BuildAuthenticationToken(key, issuer, audience, expiryMinutes, user.Id);
+            return BuildAuthenticationToken(key, issuer, audience, expiryMinutes, user.Id, sessionTokens, sessionToken);
         }
     }
 }

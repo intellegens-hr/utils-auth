@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\..\utils-common\dotnetcore\intellegens_logo.png">
+	  <None Include="..\intellegens_logo.png">
 	    <Pack>True</Pack>
 	    <PackagePath></PackagePath>
 	  </None>

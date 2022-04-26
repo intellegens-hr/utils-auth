@@ -10,6 +10,8 @@ namespace UtilsAuth.DbContext
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        public DbSet<SessionToken> SessionTokens { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

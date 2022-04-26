@@ -10,7 +10,7 @@ namespace UtilsAuth.Demo.Api.Controllers
 {
     public class AuthenticationControllerApi : AuthenticationControllerApiBase<UserModel, UserProfile>
     {
-        public AuthenticationControllerApi(IJwtTokenService<UserModel> jwtTokenService, IUserAuthService<UserModel> userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService) : base(jwtTokenService, userAuthService, utilsAuthConfiguration, refreshTokenService)
+        public AuthenticationControllerApi(IJwtTokenService<UserModel> jwtTokenService, IUserAuthService<UserModel> userAuthService, IUtilsAuthConfiguration utilsAuthConfiguration, IRefreshTokenService refreshTokenService, ISessionTokenService sessionTokenService) : base(jwtTokenService, userAuthService, utilsAuthConfiguration, refreshTokenService, sessionTokenService)
         {
         }
     }
